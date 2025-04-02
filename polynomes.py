@@ -159,7 +159,7 @@ if __name__ == '__main__':
 
 	### EXECICE 5
 
-	#assert(PolynomialZq([0,0,2],4,4).mul(PolynomialZq([0,0,5,3],4,4)).__str__() == "0*X^3 + 0*X^2 + 2*X^1 + 2")
+	assert(PolynomialZq([0,0,2],4,4).mul(PolynomialZq([0,0,5,3],4,4)).__str__() == "0*X^3 + 0*X^2 + 2*X^1 + 2")
 
 	### EXERCICE 6
 	# L'exercice 6 n'est pas fini, la methode mulKaratsuba ne fonctionne pas. 

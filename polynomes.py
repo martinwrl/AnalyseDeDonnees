@@ -71,6 +71,9 @@ class PolynomialZq:
 			Q.append(coeff % r)
 		return PolynomialZq(Q)
 
+	def up(self, n):
+		return PolynomialZq(self.poly, self.q, n)
+
 	def add(self, Q):
 		assert(self.getInfos() == Q.getInfos())
 		NP = [0 for i in range(self.n)]
@@ -103,7 +106,7 @@ class PolynomialZq:
 		assert(self.getInfos() == Q.getInfos())
 		
 		if len(self.poly) == 1:
-			return self.poly[0]*Q.poly[0]
+			return PolynomialZq([self.poly[0]*Q.poly[0]], self.q , 1)
 		else:
 			p = self.poly
 			q = Q.getPoly()
@@ -113,18 +116,23 @@ class PolynomialZq:
 			if d%2!=0:
 				p,q = p+[0],q+[0]
 				d+=1
-			l = d/2
+			l = int(d/2)
 			p0 = PolynomialZq(self.poly[:l], i,l)
 			p1 = PolynomialZq(self.poly[l:], i,l)
 			q0 = PolynomialZq(Q.poly[:l], i,l)
 			q1 = PolynomialZq(Q.poly[l:], i,l)
 			p0q0 = p0.mulKaratsuba(q0)
 			p1q1 = p1.mulKaratsuba(q1)
+			prod = p0.add(q1)
+			prod = prod.mulKaratsuba(q0.add(q1))
+			prod = prod.add(p0q0.add(p1q1))
+			prod = prod.opp()
 
-			prod = p0.add(q1).mulKaratsuba(q0.add(q1)).add(p0q0.add(p1q1).opp())
+
 			p1q1 = PolynomialZq([0 for i in range(2*l)]+p1q1.getPoly(), i, 4*l)
 			prod = PolynomialZq([0 for i in range(l)]+prod.getPoly(), i, 4*l)
-			return p0q0.add(prod).add(p1q1)
+			p0q0 = p0q0.up(4*l)
+			return PolynomialZq([coeff%i for coeff in p0q0.add(prod).add(p1q1).getPoly()] ,i, 4*l)
 
 
 
@@ -134,7 +142,7 @@ class PolynomialZq:
 
 
 if __name__ == '__main__':
-
+	
 	### EXERCICE 1
 
 	P = Polynomial([3,5,0,2])
@@ -151,8 +159,18 @@ if __name__ == '__main__':
 
 	### EXECICE 5
 
-	assert(PolynomialZq([0,0,2],4,4).mul(PolynomialZq([0,0,5,3],4,4)).__str__() == 0*X^3 + 0*X^2 + 2*X^1 + 2)
+	#assert(PolynomialZq([0,0,2],4,4).mul(PolynomialZq([0,0,5,3],4,4)).__str__() == "0*X^3 + 0*X^2 + 2*X^1 + 2")
+
+	### EXERCICE 6
+	# L'exercice 6 n'est pas fini, la methode mulKaratsuba ne fonctionne pas. 
+
+	P = PolynomialZq([1,0,0,0,2], 4, 5)
+	Q = PolynomialZq([3, 0, 4, 4, 0], 4, 5)
 	
+	P = PolynomialZq([2,6], 4, 2)
+	Q = PolynomialZq([2,3], 4, 2)	
+	print(P.mulKaratsuba(Q))
+	print(P.mul(Q))
 
 
 

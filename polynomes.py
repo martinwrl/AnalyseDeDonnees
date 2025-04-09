@@ -34,6 +34,19 @@ class Polynomial:
 			Q.append(coeff*c)
 		return Polynomial(Q)
 
+	def mul(self, Q):
+		p = self.poly
+		q = Q.getPoly()
+		d = len(p)
+		NP = [0 for i in range(2*d-1)]
+		for i in range(d):
+			for j in range(d):
+				NP[i+j]+=p[i]*q[j]
+		return Polynomial(NP)
+
+	def transfoPoly(self, q, n):
+		return PolynomialZq(self.getPoly(), q, n)
+
 ############################################################################################
 
 class PolynomialZq:
@@ -85,7 +98,6 @@ class PolynomialZq:
 
 	def mul(self, Q):
 		assert(self.getInfos() == Q.getInfos())
-
 		p = self.poly
 		q = Q.getPoly()
 		d = len(p)
@@ -95,11 +107,24 @@ class PolynomialZq:
 				NP[i+j]+=p[i]*q[j]
 		return PolynomialZq(NP, self.getInfos()[0], self.getInfos()[1])
 
+	def reversePoly(self):
+		return Polynomial(self.getPoly())
+
 	def opp(self):
 		NP = [0 for i in range(self.n)]
 		for i in range(len(self.poly)):
 			NP[i] -= self.poly[i]
 		return PolynomialZq([coeff % self.q for coeff in NP], self.q, self.n)
+
+	def mulPolyNorm(self, Q):
+		assert(self.getInfos() == Q.getInfos())
+
+		n, i = self.getInfos()
+		p = self.reversePoly()
+		q = Q.reversePoly()
+		prod = p.mul(q)
+		return prod.transfoPoly(i,n)
+
 
 	def mulKaratsuba(self, Q):
 
@@ -154,7 +179,7 @@ if __name__ == '__main__':
 
 	assert(PolynomialZq([5,0,2], 4, 3).add(PolynomialZq([3, 2, 1], 4, 3)).__str__()=="3*X^2 + 2*X^1 + 0")
 
-	# test pour saboir si le modulo des polynomes fonctionne bien
+	# test pour savoir si le modulo des polynomes fonctionne bien
 	assert(PolynomialZq([2,5,7,3,5], 3, 3).__str__() == "1*X^2 + 1*X^1 + 0")
 
 	### EXECICE 5
@@ -171,6 +196,7 @@ if __name__ == '__main__':
 	Q = PolynomialZq([2,3], 4, 2)	
 	print(P.mulKaratsuba(Q))
 	print(P.mul(Q))
+	print(P.mulPolyNorm(Q))
 
 
 

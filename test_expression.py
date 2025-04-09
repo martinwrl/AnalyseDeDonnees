@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-from expression import Tree
+from arbres import Tree
 
 
 class TestTree(unittest.TestCase):

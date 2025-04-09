@@ -2,6 +2,7 @@ from arbres import Tree
 import unittest
 
 
+
 class TestArbre(unittest.TestCase):
 
 	def test_feuille(self):
@@ -24,7 +25,10 @@ class TestArbre(unittest.TestCase):
 	def test_eq(self):
 		a = Tree('f', Tree('a'), Tree('b'))
 		b = Tree('f', Tree('a'), Tree('b'))
-		self.assertEqual(a, b
+		self.assertEqual(a, b)
+
+		
+
 
 if __name__ == '__main__':
 	unittest.main()

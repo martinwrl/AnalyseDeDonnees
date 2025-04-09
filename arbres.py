@@ -8,7 +8,11 @@ class Tree:
 
 	def __init__(self, name : str ,*children : Tree):
 		self.__label = name
-		self.__children = tuple(children)
+		print(children)
+		if len(children) == 1 and type(children) != Tree:
+			self.__children = (tuple(children)[0])
+		else:
+			self.__children = tuple(children)
 
 
 	def __str__(self):
@@ -39,7 +43,7 @@ class Tree:
 
 	def children(self):
 		if self.is_leaf():
-			return []
+			return ()
 		else:
 			return tuple(self.__children)
 
@@ -113,9 +117,10 @@ if __name__ == '__main__':
 	b = Tree('f', Tree('a'), Tree('b'))
 	print(a.__eq__(b))
 	print(a.__str__())
-	c = Tree('e', Tree('a'), Tree('b'),Tree('c'))
+	c = Tree('e', (Tree('a'), Tree('b'),Tree('c')))
 	print(c.__str__())
 
+	print(type(a) == Tree)
 
 
 

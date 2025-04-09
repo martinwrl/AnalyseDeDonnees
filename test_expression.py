@@ -84,5 +84,21 @@ class TestTree(unittest.TestCase):
         self.assertEqual(Tree('+', X, X).deriv('X'), Tree('+', un, un))
         self.assertEqual(Tree('+', X, un).deriv('X'), Tree('+', un, zero))
 
+    def test_deriv_multipication(self):
+        P = Tree('X')
+        Q = Tree('*', Tree('X'), Tree('2'))
+        R = Tree('*', Tree('+', Tree('3'), Tree('X')), Tree('X'))
+
+
+    def test_simplify(self):
+        P = Tree('+', Tree('0'), Tree('0'))
+        Q = Tree('+', Tree('X'), Tree('0'))
+        R = Tree('+', Tree('1'), Tree('X'))
+        self.assertEqual(P.simplify(), Tree('0'))
+        self.assertEqual(Q.simplify(), Tree('X'))
+        self.assertEqual(R.simplify(), Tree('X'))
+
+
+
 if __name__ == '__main__':
     unittest.main()

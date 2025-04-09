@@ -8,12 +8,10 @@ class Tree:
 
 	def __init__(self, name : str ,*children : Tree):
 		self.__label = name
-		print(children)
-		if len(children) == 1 and type(children) != Tree:
-			self.__children = (tuple(children)[0])
+		if len(children) == 1 and isinstance(children[0], (list, tuple)):
+			self.__children = tuple(children[0])
 		else:
 			self.__children = tuple(children)
-
 
 	def __str__(self):
 		if self.is_leaf():
@@ -26,7 +24,7 @@ class Tree:
 			return f"{self.label()}({string[1:]})"
 
 	def __eq__(self, arbre:Tree):
-		if arbre.is_leaf() and self.is_leaf() and self.label() == arbre.label():
+		if self.is_leaf() and arbre.is_leaf() and self.label() == arbre.label():
 			return True
 		else:
 			if self.nb_children() != arbre.nb_children():
@@ -45,17 +43,18 @@ class Tree:
 		if self.is_leaf():
 			return ()
 		else:
-			return tuple(self.__children)
+			return self.__children
 
 	def nb_children(self):
-		return len(self.__children)
+		return len(list(self.__children))
+
 
 	def child(self, i:int):
 		assert(i<=(len(self.__children)))
 		return self.__children[i]
 
 	def is_leaf(self):
-		if len(self.__children) == 0:
+		if self.nb_children() == 0:
 			return True
 		else:
 			return False
@@ -64,7 +63,10 @@ class Tree:
 		if self.is_leaf():
 			return 0
 		else:
-			return max(1+sousArbre.depth() for sousArbre in self.children())
+			return max(1+ sousArbre.depth() for sousArbre in list(self.__children))
+
+	def __repr__(self):
+		return self.__str__()
 
 
 	def deriv(self, var : str):
@@ -77,15 +79,15 @@ class Tree:
 			if self.label() == '+' or self.label() == '-':
 				l = []
 				for i in range(self.nb_children()):
-					if self.child(i) == var:
+					if self.child(i).label() == var:
 						l.append('1')
 					else:
 						l.append('0')
-					return Tree(self.label(), (Tree(el) for el in l))
+				return Tree(self.label(), tuple(Tree(el) for el in l))
 			elif self.label() == '*':
 				countVar = 0
 				for el in self.children():
-					if el == var:
+					if el.label() == var:
 						countVar += 1
 				premsVar = True
 				l = []
@@ -94,12 +96,53 @@ class Tree:
 						l.append(countVar)
 					else:
 						l.append(self.child(i).label())
+				return Tree('*', tuple(Tree(el) for el in l))
 		else:
 			assert(self.label() in ('-', '+', '*', '/'))
 			if self.label() == '+' or self.label() == '-':
-				return Tree(self.label(), (sousArbre.deriv(var) for sousArbre in self.children()))
+				return Tree(self.label(), tuple(sousArbre.deriv(var) for sousArbre in self.children()))
 			elif self.label() == '*' and self.nb_children()>=2:
-				return Tree('+', Tree('*', (el for el in (self.child(0).deriv(var), self.children()[1:]))), Tree('*', self.child(0), Tree('*', (el for el in self.children()[1:])).deriv(var) )    )
+				u = self.child(0)
+				v = Tree('*', *self.children()[1:])
+				up = u.deriv(var)
+				vp = v.deriv(var)
+				return Tree('+', Tree('*', up, v), Tree('*', u, vp))
+
+	def simplify(self):
+
+		if self.depth() == 2:
+			if self.label() == '+' or self.label() == '-':
+				l = []
+				for i in range(self.nb_children()):
+					if self.child(i).label() != 0:
+						l.append(self.child(i))
+				if len(l) >= 2:
+					return Tree('+', *l)
+				elif len(l) == 1:
+					return l[0]
+				else:
+					return Tree('0')
+			# il manque encore l'addition et la multiplication de deux entiers
+			elif self.label() == '*':
+				if Tree('0') in self.__children:
+					return Tree('0')
+				#### Il y a une erreur dans cette méthode : il y a un probleme lors de comparaison ci dessus. 
+				#### Erreur : NoneType object has no attribute is_leaf
+				else:
+					l = []
+					for i in range(self.nb_children()):
+						if self.child(i).label() != 1:
+							l.append(self.child(i))
+					if len(l) >= 2:
+						return Tree('*', *l)
+					elif len(l)==1:
+						return l[0]
+					else:
+						return Tree('1')
+
+
+
+
 
 
 

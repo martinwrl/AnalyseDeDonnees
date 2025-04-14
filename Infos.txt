@@ -1,0 +1,2 @@
+Ceci est un test pour voir si les depots gits fonctionnent sur un ssd 
+externe.

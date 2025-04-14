@@ -182,7 +182,7 @@ class Tree:
 		if self.is_leaf():
 			return self.label()
 		else:
-			return "".join([f"{self.label()}{child.infixe()}" for child in self.children()])[1:]
+			return "("+"".join([f"{self.label()}{child.infixe()}" for child in self.children()])[1:]+")"
 
 	def evaluate(self, var:str, x:int):
 		return int(self.substitute(Tree(var), Tree(str(x))).simplify().__str__())

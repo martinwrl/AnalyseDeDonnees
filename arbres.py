@@ -70,7 +70,9 @@ class Tree:
 
 
 	def deriv(self, var : str):
-		if self.is_leaf():
+		if self.nb_children() == 1:
+			return self.child(0).deriv(var)
+		elif self.is_leaf():
 			if self.label()==var:
 				return Tree('1')
 			else:
@@ -78,24 +80,25 @@ class Tree:
 		elif self.depth() == 1:
 			if self.label() == '+' or self.label() == '-':
 				l = []
-				for i in range(self.nb_children()):
-					if self.child(i).label() == var:
-						l.append('1')
+				for child in self.children():
+					if child.label() == var:
+						l.append(Tree('1'))
 					else:
-						l.append('0')
-				return Tree(self.label(), tuple(Tree(el) for el in l))
+						l.append(Tree('0'))
+				return Tree(self.label(), tuple(el for el in l))
 			elif self.label() == '*':
 				countVar = 0
-				for el in self.children():
-					if el.label() == var:
+				for child in self.children():
+					if child.label() == var:
 						countVar += 1
 				premsVar = True
 				l = []
-				for i in range(self.nb_children()):
-					if premsVar and self.child(i).label() == var:
+				for child in self.children():
+					if premsVar and child.label() == var:
 						l.append(countVar)
+						premsVar = False
 					else:
-						l.append(self.child(i).label())
+						l.append(child.label())
 				return Tree('*', tuple(Tree(el) for el in l))
 		else:
 			assert(self.label() in ('-', '+', '*', '/'))
@@ -108,62 +111,92 @@ class Tree:
 				vp = v.deriv(var)
 				return Tree('+', Tree('*', up, v), Tree('*', u, vp))
 
+
 	def simplify(self):
+		if self.nb_children() == 1:
+			return self.child(0).simplify()
+		if self.depth() == 0:
+			return self
 
-		if self.depth() == 2:
-			if self.label() == '+' or self.label() == '-':
-				l = []
-				for i in range(self.nb_children()):
-					if self.child(i).label() != 0:
-						l.append(self.child(i))
-				if len(l) >= 2:
-					return Tree('+', *l)
-				elif len(l) == 1:
-					return l[0]
+		simplChildren = tuple(child.simplify() for child in self.children())
+		simpl = Tree(self.label(), simplChildren)
+
+		if self.label() in ('*', '+', '-'):
+			flattened = []
+			for child in simplChildren:
+				if self.label() == child.label():
+					flattened.extend(child.children())
 				else:
-					return Tree('0')
-			# il manque encore l'addition et la multiplication de deux entiers
-			elif self.label() == '*':
-				if Tree('0') in self.__children:
-					return Tree('0')
-				#### Il y a une erreur dans cette méthode : il y a un probleme lors de comparaison ci dessus. 
-				#### Erreur : NoneType object has no attribute is_leaf
-				else:
-					l = []
-					for i in range(self.nb_children()):
-						if self.child(i).label() != 1:
-							l.append(self.child(i))
-					if len(l) >= 2:
-						return Tree('*', *l)
-					elif len(l)==1:
-						return l[0]
-					else:
-						return Tree('1')
+					flattened.append(child)
+			simplChildren = tuple(flattened)
 
+		if self.label() == '+' or self.label() == '-':
+			constant = 0
+			other = []
+			for child in simplChildren:
+				try:
+					constant += int(child.label())
+				except:
+					other.append(child)
+			if constant != 0:
+				other.append(Tree(str(constant)))
+			if not other:
+				return Tree('0')
+			elif len(other) == 1:
+				return other[0]
+			else:
+				return Tree(self.label(), *other)
 
+		if self.label() == '*':
+			if any(child.label() == '0' for child in simplChildren):
+				return Tree('0')
+			constant = 1
+			other = []
+			for child in simplChildren:
+				try:
+					constant *= int(child.label())
+				except:
+					other.append(child)
+			if constant == 0:
+				return Tree('0')
+			if constant != 1:
+				other = [Tree(str(constant))] + other
+			if not other:
+				return Tree('1')
+			elif len(other) == 1:
+				return other[0]
+			else:
+				return Tree(self.label(), *other)
 
+		return simpl
+		
+	def substitute(self, t1:Tree, t2:Tree):
+		if self == t1:
+			return t2
+		elif self.is_leaf():
+			return self
+		else:
+			return Tree(self.label(), tuple(child.substitute(t1, t2) for child in self.children()))
 
+	def infixe(self):
+		if self.is_leaf():
+			return self.label()
+		else:
+			return "".join([f"{self.label()}{child.infixe()}" for child in self.children()])[1:]
 
-
-
-
-
-
-
-
+	def evaluate(self, var:str, x:int):
+		return int(self.substitute(Tree(var), Tree(str(x))).simplify().__str__())
 
 
 			
 if __name__ == '__main__':
-
-	a = Tree('f', Tree('a'), Tree('b'))
-	b = Tree('f', Tree('a'), Tree('b'))
-	print(a.__eq__(b))
-	print(a.__str__())
-	c = Tree('e', (Tree('a'), Tree('b'),Tree('c')))
-	print(c.__str__())
-
-	print(type(a) == Tree)
+	b = Tree('+',
+		Tree('+',
+			Tree('*', Tree('3'), Tree('*', Tree('X'), Tree('X'))),
+			Tree('*', Tree('5'), Tree('X'))),
+	 	Tree('7'))
+	a = Tree('*', Tree('3'), Tree('*', Tree('X'), Tree('X')))
+	print(b.simplify().infixe())
 
 
 

@@ -34,8 +34,6 @@ def createWords(l:list, n:int):
 	for crois in l:
 		for i in range(n):
 			L[i] += 'hh'
-		print(order)
-		print(crois)
 		L[order[crois]] = L[order[crois]][:-1] + 'd'
 		L[order[crois+1]] = L[order[crois+1]][:-1] + 'u'
 		order[crois], order[crois + 1] = order[crois + 1], order[crois]
@@ -72,7 +70,7 @@ if __name__ == '__main__':
 
 
 	n = 6
-	w = 50
+	w = 70
 	croisements = [3, 2, 1, 0, 4, 2, 3, 4, 2, 0, 1]
 	colorList = ['green', 'red', 'blue', 'yellow', 'cyan', 'orange', 'black']
 
@@ -89,11 +87,11 @@ if __name__ == '__main__':
 	text3 = tk.Label(root, text="Sortie")
 	text4 = tk.Label(root, text=f"{order}", borderwidth=2, relief='solid')
 
-	sideFrame = tk.Frame(root, height=(n+1)*w, width=(len(croisements)*2+1)*w)
+	sideFrame = tk.Frame(root, height=(n+1)*w, width=30)
 	# Labels inside side Frame
 
 	for i in range(n):
-		tk.Label(sideFrame, text=f"{i}", height=10).grid(row=i, column=0, pady=(w/4)-5)
+		tk.Label(sideFrame, text=f"{i}").place(x=10, y=i*w+10+w/2)
 
 
 

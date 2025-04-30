@@ -64,10 +64,7 @@ def lignesBrisees(n, w, croisements:list):
 
 
 
-
 if __name__ == '__main__':
-
-
 
 	n = 6
 	w = 70

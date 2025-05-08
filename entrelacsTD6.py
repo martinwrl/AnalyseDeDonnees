@@ -91,7 +91,8 @@ class App():
 	def click(self, event):
 		x = event.x
 		y = event.y 
-		listRem = []
+		listRem = [] 
+		
 
 		for i in range(len(self.data.croisements)-1):
 			if self.data.croisements[i] == self.data.croisements[i+1]:

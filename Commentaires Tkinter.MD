@@ -1,0 +1,4 @@
+Ton interface graphique et propre et jolie, et tu as bien progressé dans le TD5 et tout semble bien fonctionner.
+Pour le TD6, la distinction App / Data est plutôt bien comprise, même si la génération aléatoire de nouveaux croisements et le dénouement devrait être plutôt dans la partie Data que App.
+En ce qui concerne les mouvements de Reidemeister, je n'ai pas l'impression que ca fasse le comportement attendu à chaque fois, même si ca fonctionne sur des exemples simples; sans doute que si tu gardes la même longeur de fils en mettant un croisement qui n'existe pas dans ta liste, il est plus facile de voir ce qui se passe.
+Néanmoins, c'est un très bon TD.
